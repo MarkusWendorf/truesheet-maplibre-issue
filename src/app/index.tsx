@@ -34,6 +34,9 @@ function MapSheetButton({ draggable }: { draggable: boolean }) {
           <Map style={{ flex: 1 }} mapStyle={MAP_STYLE}>
             <Camera initialViewState={{ center: [10, 54], zoom: 4 }} />
           </Map>
+          <Pressable style={styles.close} onPress={() => sheet.current?.dismiss()}>
+            <Text style={styles.closeText}>✕</Text>
+          </Pressable>
         </GestureHandlerRootView>
       </TrueSheet>
     </>
@@ -56,6 +59,21 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     backgroundColor: '#208AEF',
+  },
+  close: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+  },
+  closeText: {
+    fontSize: 18,
+    fontWeight: '600',
   },
   buttonText: {
     color: '#ffffff',
