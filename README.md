@@ -6,7 +6,7 @@ Expo SDK 58 default template with `@lodev09/react-native-true-sheet` 4.0.1 and `
 
 ```sh
 npm install
-npx expo run:android
+npm run android
 ```
 
 ## Reproduce

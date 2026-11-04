@@ -1,102 +1,64 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { TrueSheet } from '@lodev09/react-native-true-sheet';
+import { Camera, Map } from '@maplibre/maplibre-react-native';
+import { useRef } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { MapSheetButton } from '@/components/map-sheet';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+const MAP_STYLE = 'https://demotiles.maplibre.org/style.json';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+export default function Index() {
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <View style={styles.screen}>
+      <Text style={styles.text}>
+        Open the non-draggable sheet and pinch or pan the map vertically. On Android the sheet takes
+        over the gesture once the finger moves past the touch slop, so the map stops zooming or
+        panning.
+      </Text>
+      <MapSheetButton draggable={false} />
+      <MapSheetButton draggable />
+    </View>
   );
 }
 
-export default function HomeScreen() {
+function MapSheetButton({ draggable }: { draggable: boolean }) {
+  const sheet = useRef<TrueSheet>(null);
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <>
+      <Pressable style={styles.button} onPress={() => sheet.current?.present()}>
+        <Text style={styles.buttonText}>Open map sheet (draggable={String(draggable)})</Text>
+      </Pressable>
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <MapSheetButton draggable={false} />
-        <MapSheetButton draggable />
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      <TrueSheet ref={sheet} detents={[0.9]} draggable={draggable} style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Map style={{ flex: 1 }} mapStyle={MAP_STYLE}>
+            <Camera initialViewState={{ center: [10, 54], zoom: 4 }} />
+          </Map>
+        </GestureHandlerRootView>
+      </TrueSheet>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     justifyContent: 'center',
-    flexDirection: 'row',
+    gap: 16,
+    padding: 24,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+  text: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  button: {
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: '#208AEF',
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  buttonText: {
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });
